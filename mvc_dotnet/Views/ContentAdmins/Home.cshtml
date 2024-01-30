@@ -1,0 +1,21 @@
+﻿@model mvc_dotnet.Models.ContentAdmin
+
+@{
+    ViewData["Title"] = "Content Admin Home";
+}
+
+<div class="container mt-4">
+    <h2>Welcome to the Content Admin Home Page, <span class="text-primary">@ViewData["Username"]</span>!</h2>
+
+    <p class="text-info">Explore other pages:</p>
+    <ul class="list-group">
+        <li class="list-group-item"><a class="text-decoration-none text-success" asp-controller="Movies" asp-action="Index">Available Movies</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-warning" asp-controller="Movies" asp-action="Create">Add a movie to the main feed</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-danger" asp-controller="Cinemas" asp-action="Index">Available Cinemas</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-info" asp-controller="Cinemas" asp-action="Create">Add a new Cinema to the list</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-primary" asp-controller="Provoles" asp-action="Create">Add a new screening</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-secondary" asp-controller="Provoles" asp-action="Index">Edit a screening</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-danger" asp-controller="ContentAdmins" asp-action="Index">Your profile</a></li>
+
+    </ul>
+</div>

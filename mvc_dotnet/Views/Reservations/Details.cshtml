@@ -1,0 +1,38 @@
+﻿@model mvc_dotnet.Models.Reservation
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4><i>@Html.DisplayFor(model => model.Customers.Name):</i> Reservation made successfully! </h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NumberOfSeats)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NumberOfSeats)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Customers)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Customers.Name)
+        </dd>
+        <hr />
+        <h6>Important information about the screening!</h6>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Provoles)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Provoles.MoviesName)
+        </dd>        
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit Reservation</a> |
+    <a asp-controller="Customers" asp-action="Home">Go to Home Page</a>
+</div>

@@ -1,0 +1,19 @@
+﻿@model mvc_dotnet.Models.Customer
+
+@{
+    ViewData["Title"] = "Customer Home";
+}
+
+<div class="container mt-4">
+    <h2>Welcome to the <i>Customer</i> Home Page!</h2>
+
+    <p class="text-info">Explore other pages:</p>
+    <ul class="list-group">
+        <li class="list-group-item"><a class="text-decoration-none text-success" asp-controller="Provoles" asp-action="Index">Available Movies Right Now</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-primary" asp-controller="Provoles" asp-action="Index">Available screenings</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-warning" asp-controller="Reservations" asp-action="Create">Book your tickets for a screening</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-danger" asp-controller="Customers" asp-action="Index">Your reservations</a></li>
+    </ul>
+</div>
+
+

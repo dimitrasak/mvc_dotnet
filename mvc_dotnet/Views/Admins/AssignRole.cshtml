@@ -1,0 +1,88 @@
+﻿@model List<mvc_dotnet.Models.User>
+
+@{
+    ViewData["Title"] = "Assign Roles";
+}
+
+<h2>Assign Roles</h2>
+<!-- Display success message if it exists in TempData -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<!-- Display error message if it exists in TempData -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Current Role</th>
+            <th>New Role</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Username</td>
+                <td>@user.Email</td>
+                <td id="roleTd_@user.Username">@user.Role</td>
+                <td>
+                    <!-- Dropdown or input for selecting a new role -->
+                    <select data-val="true" data-val-required="The NewRole field is required." id="user_NewRole_@user.Username" name="user.NewRole">
+                        <option value="Admin">Admin</option>
+                        <option value="Customer">Customer</option>
+                        <option value="Content">Content Admin</option>
+                        <!-- Add more options as needed -->
+                    </select>
+                    <input type="hidden" id="newRoleHidden_@user.Username" />
+
+                </td>
+                <td>
+                    <!-- Button or form to submit role assignment -->
+                    <button type="button" onclick="assignRole('@user.Username')">Assign Role</button>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    function assignRole(username) {
+        var newRole = $('#user_NewRole_' + username).val();
+        $.ajax({
+            url: '/Admins/AssignRole',
+            method: 'POST',
+            data: { username: username, newRole: newRole },
+            success: function (data) {
+                // Update the role value in the table without reloading the page
+                $('#roleTd_' + username).text(newRole);
+
+                // Handle the success response if needed
+                console.log('Roles assigned successfully');
+            },
+            error: function (error) {
+                // Handle the error response if needed
+                console.error('Error assigning roles:', error);
+            }
+        });
+    }
+</script>
+
+
+
+
+

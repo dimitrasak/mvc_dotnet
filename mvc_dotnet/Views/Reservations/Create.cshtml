@@ -1,0 +1,74 @@
+﻿@model mvc_dotnet.Models.Reservation
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create Reservation</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" method="post">
+            <div id="step1" class="step">
+                <h4>Step 1: Choose a Movie and Select Cinema</h4>
+                <div class="form-group">
+                    <label asp-for="ProvolesMoviesName" class="control-label">Select Movie</label>
+                    <select asp-for="ProvolesMoviesName" class="form-control" asp-items="@ViewBag.ProvolesMoviesName"></select>
+                </div>
+                <input type="hidden" id="ProvolesMoviesId" name="ProvolesMoviesId" />
+                <div class="form-group">
+                    <label asp-for="ProvolesCinemasId" class="control-label">Select Cinema</label>
+                    <select asp-for="ProvolesCinemasId" class="form-control" asp-items="@ViewBag.ProvolesCinemasId"></select>
+                </div>
+                <button type="button" onclick="nextStep()" class="btn btn-primary">Next</button>
+            </div>
+
+            <div id="step2" class="step" style="display:none;">
+                <h4>Step 2: Make Reservation</h4>
+                <div class="form-group">
+                    <label asp-for="NumberOfSeats" class="control-label">Number of Seats</label>
+                    <input asp-for="NumberOfSeats" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="CustomersId" class="control-label">Select Customer</label>
+                    <select asp-for="CustomersId" class="form-control" asp-items="@ViewBag.CustomersId"></select>
+                </div>
+                <button type="button" onclick="prevStep()" class="btn btn-secondary">Previous</button>
+                <input type="submit" value="Create Reservation" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function fetchMovieId(selectElement) {
+        var selectedMovieName = selectElement.value;
+        // Make an AJAX request to fetch the corresponding ProvolesMoviesId
+        // Assume you have an action method named FetchMovieId in your controller
+        $.get("/Reservations/FetchMovieId", { movieName: selectedMovieName }, function (data) {
+            // Update the hidden field with the fetched ProvolesMoviesId
+            $("#ProvolesMoviesId").val(data);
+        });
+    }
+    function nextStep() {
+        var currentStepElement = document.getElementById('step1');
+        var nextStepElement = document.getElementById('step2');
+
+        if (currentStepElement && nextStepElement) {
+            currentStepElement.style.display = 'none';
+            nextStepElement.style.display = 'block';
+        }
+    }
+
+    function prevStep() {
+        var currentStepElement = document.getElementById('step2');
+        var prevStepElement = document.getElementById('step1');
+
+        if (currentStepElement && prevStepElement) {
+            currentStepElement.style.display = 'none';
+            prevStepElement.style.display = 'block';
+        }
+    }
+</script>

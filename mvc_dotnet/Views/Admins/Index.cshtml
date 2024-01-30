@@ -1,0 +1,44 @@
+﻿@model IEnumerable<mvc_dotnet.Models.Admin>
+
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Hello <i>admin...</i></h1>
+<h6>Navigate through your profile page.</h6>
+<h7>If session was established only the info about the logged in user would be visible.</h7>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserUsernameNavigation)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserUsernameNavigation.Username)
+            </td>
+            <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit your profile</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
