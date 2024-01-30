@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.Differencing;
 using Microsoft.EntityFrameworkCore;
 using mvc_dotnet.Models;
+using X.PagedList;
 
 namespace mvc_dotnet.Controllers
 {
@@ -21,10 +22,19 @@ namespace mvc_dotnet.Controllers
         }
 
         // GET: Provoles
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page)
         {
             var ticketServiceContext = _context.Provoles.Include(p => p.Cinemas).Include(p => p.ContentAdmin).Include(p => p.Movies);
-            return View(await ticketServiceContext.ToListAsync());
+            var provoles = await ticketServiceContext.ToListAsync();
+            // Pagination for users
+            if (page != null && page < 1)
+            {
+                page = 1;
+            }
+
+            int PageSize = 10;
+            var provolesData = await provoles.ToPagedListAsync(page ?? 1, PageSize);
+            return View(provolesData);
         }
         
         // GET: Provoles/Details/5
@@ -98,9 +108,10 @@ namespace mvc_dotnet.Controllers
                 createProvole.MoviesId = selectedMovie.Id;
                 createProvole.MoviesName = selectedMovie.Name;
                 createProvole.Id = GetNextProvoleId();
-                createProvole.DatetimeColumn = createProvole.DatetimeColumn; 
+                //createProvole.DatetimeColumn = createProvole.DatetimeColumn; 
 
                 var provoleEntity = new Provole(createProvole);
+                provoleEntity.DatetimeColumn = createProvole.DatetimeColumn;
 
                 if (_context.Provoles.Any(p => p.MoviesId == createProvole.MoviesId && p.CinemasId == createProvole.CinemasId))
                 {
@@ -124,7 +135,7 @@ namespace mvc_dotnet.Controllers
                 if (ModelState.IsValid)
                 {                    
                     
-                    Console.WriteLine("inside if: " + provoleEntity.Id + ", " + provoleEntity.CinemasId + ", " + provoleEntity.MoviesId + ", " + provoleEntity.MoviesName + ", " + provoleEntity.ContentAdminId);
+                    Console.WriteLine("inside if: " + provoleEntity.Id + ", " + provoleEntity.CinemasId + ", " + provoleEntity.MoviesId + ", " + provoleEntity.MoviesName + ", " + provoleEntity.ContentAdminId+ ", " +provoleEntity.DatetimeColumn);
 
                     _context.Provoles.Add(provoleEntity);
                     await _context.SaveChangesAsync();
@@ -175,7 +186,7 @@ namespace mvc_dotnet.Controllers
 
             //ViewData["CinemasId"] = new SelectList(_context.Cinemas, "Id", "Name", provole.CinemasId);
             ViewData["ContentAdminId"] = new SelectList(_context.ContentAdmins, "Id", "UserUsername", provole.ContentAdminId);
-
+            ViewData["DateTimeColumn"] = provole.DatetimeColumn;
             // Set MoviesName to the selected movie's name for display in the Edit form
             ViewData["MoviesName"] = provole.MoviesName;
 
@@ -185,7 +196,8 @@ namespace mvc_dotnet.Controllers
                 CinemasId = provole.CinemasId,
                 MoviesId = provole.MoviesId,
                 MoviesName = provole.MoviesName,
-                ContentAdminId = provole.ContentAdminId
+                ContentAdminId = provole.ContentAdminId,
+                DatetimeColumn = provole.DatetimeColumn
                 // Populate other properties as needed
             };
 
@@ -219,6 +231,7 @@ namespace mvc_dotnet.Controllers
                 existingProvole.MoviesId = editProvole.MoviesId;
                 existingProvole.MoviesName = editProvole.MoviesName.ToString();
                 existingProvole.ContentAdminId = editProvole.ContentAdminId;
+                existingProvole.DatetimeColumn = editProvole.DatetimeColumn;
 
                 // Validate the model state
                 if (ModelState.IsValid)
@@ -232,6 +245,8 @@ namespace mvc_dotnet.Controllers
                 ViewData["CinemasId"] = new SelectList(_context.Cinemas, "Id", "Name", editProvole.CinemasId);
                 ViewData["ContentAdminId"] = new SelectList(_context.ContentAdmins, "Id", "UserUsername", editProvole.ContentAdminId);
                 ViewData["MoviesName"] = new SelectList(_context.Movies, "Id", "Name", editProvole.MoviesName);
+                ViewData["DateTimeColumn"] = editProvole.DatetimeColumn;
+
                 return View(editProvole);
             }
             catch (DbUpdateException ex)

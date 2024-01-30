@@ -4,8 +4,8 @@ namespace mvc_dotnet.Models.Metadata
 {
     public class MovieMetadata
     {
-        [Display(Name = "Content Admin Id")]
-        public int? ContentAdminId { get; set; }
+        [Display(Name = "Content Admin")]
+        public int? ContentAdmin { get; set; }
 
     }
 }

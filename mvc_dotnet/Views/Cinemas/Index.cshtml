@@ -1,10 +1,12 @@
-﻿@model IEnumerable<mvc_dotnet.Models.Cinema>
+﻿@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model X.PagedList.IPagedList<mvc_dotnet.Models.Cinema>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Cinemas</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -13,13 +15,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.First().Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Seats)
+                @Html.DisplayNameFor(model => model.First().Seats)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model._3d)
+                @Html.DisplayNameFor(model => model.First()._3d)
             </th>
             <th></th>
         </tr>
@@ -45,3 +47,19 @@
 }
     </tbody>
 </table>
+<!-- output a paging control that lets the user navigation to the previous page, next page, etc -->
+<nav>
+    @Html.PagedListPager(Model, page => Url.Action("index", new { page = page }), new PagedListRenderOptions()
+{
+    ActiveLiElementClass = "active",
+    PageClasses = new[] { "page-link" },
+    LiElementClasses = new[] { "page-item" },
+    UlElementClasses = new[] { "pagination", "justify-content-center", "mt-3" },
+    LinkToNextPageFormat = "Next",
+    LinkToPreviousPageFormat = "Previous",
+    MaximumPageNumbersToDisplay = 5,
+    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+
+})
+</nav>

@@ -2,7 +2,7 @@
 
 namespace mvc_dotnet.Models
 {
-    public class CreateProvoleModel
+    public partial class CreateProvoleModel
     {
         [Required]
         public int Id { get; set; }

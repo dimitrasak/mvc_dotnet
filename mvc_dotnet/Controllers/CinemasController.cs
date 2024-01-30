@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using mvc_dotnet.Models;
+using X.PagedList;
 
 namespace mvc_dotnet.Controllers
 {
@@ -19,11 +20,18 @@ namespace mvc_dotnet.Controllers
         }
 
         // GET: Cinemas
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page)
         {
-              return _context.Cinemas != null ? 
-                          View(await _context.Cinemas.ToListAsync()) :
-                          Problem("Entity set 'TicketServiceContext.Cinemas'  is null.");
+            var cinemas = await _context.Cinemas.ToListAsync();
+            // Pagination for users
+            if (page != null && page < 1)
+            {
+                page = 1;
+            }
+
+            int PageSize = 10;
+            var cinemasData = await cinemas.ToPagedListAsync(page ?? 1, PageSize);
+            return View(cinemasData);
         }
 
         // GET: Cinemas/Details/5

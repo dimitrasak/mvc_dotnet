@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using mvc_dotnet.Models;
+using X.PagedList;
 
 namespace mvc_dotnet.Controllers
 {
@@ -21,10 +22,19 @@ namespace mvc_dotnet.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page)
         {
             var ticketServiceContext = _context.Movies.Include(m => m.ContentAdmin);
-            return View(await ticketServiceContext.ToListAsync());
+            var movies = await ticketServiceContext.ToListAsync();
+            // Pagination for users
+            if (page != null && page < 1)
+            {
+                page = 1;
+            }
+
+            int PageSize = 10;
+            var moviesData = await movies.ToPagedListAsync(page ?? 1, PageSize);
+            return View(moviesData);
         }
 
         // GET: Movies/Details/5

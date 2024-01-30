@@ -7,7 +7,7 @@ namespace mvc_dotnet.Models.Metadata
         [Display(Name = "Number Of Seats")]
         public int? NumberOfSeats { get; set; }
 
-        [Display(Name = "Cinemas Id")]
+        [Display(Name = "Cinemas")]
         public int? ProvolesCinemasId { get; set; }
 
         [Display(Name = "Movies Id")]
@@ -16,7 +16,7 @@ namespace mvc_dotnet.Models.Metadata
         [Display(Name = "Movies Name")]
         public string? ProvolesMoviesName { get; set; }
 
-        [Display(Name = "Customer Id")]
+        [Display(Name = "Customer")]
         public int? CustomersId { get; set; }
 
 

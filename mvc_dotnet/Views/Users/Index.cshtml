@@ -1,4 +1,6 @@
-﻿@model IEnumerable<mvc_dotnet.Models.User>
+﻿@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model X.PagedList.IPagedList<mvc_dotnet.Models.User>
 
 @{
     ViewData["Title"] = "Index";
@@ -14,19 +16,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                Email
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Password)
+                Password
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreateTime)
+                Create Time
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Salt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Role)
+                Role
             </th>
             <th></th>
         </tr>
@@ -44,13 +43,10 @@
                 @Html.DisplayFor(modelItem => item.CreateTime)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Salt)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.Role)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Username">Edit</a> |
+                    <a asp-action="Edit" asp-route-id="@item.Username">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Username">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Username">Delete</a>
             </td>
@@ -58,3 +54,19 @@
 }
     </tbody>
 </table>
+<!-- output a paging control that lets the user navigation to the previous page, next page, etc -->
+<nav>
+    @Html.PagedListPager(Model, page => Url.Action("index", new { page = page }), new PagedListRenderOptions()
+{
+    ActiveLiElementClass = "active",
+    PageClasses = new[] { "page-link" },
+    LiElementClasses = new[] { "page-item" },
+    UlElementClasses = new[] { "pagination", "justify-content-center", "mt-3" },
+    LinkToNextPageFormat = "Next",
+    LinkToPreviousPageFormat = "Previous",
+    MaximumPageNumbersToDisplay = 5,
+    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+
+})
+</nav>

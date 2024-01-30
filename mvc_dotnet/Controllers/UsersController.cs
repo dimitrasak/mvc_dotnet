@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using mvc_dotnet.Models;
+using X.PagedList;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace mvc_dotnet.Controllers
 {
@@ -21,11 +23,18 @@ namespace mvc_dotnet.Controllers
         }
 
         // GET: Users
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page)
         {
-              return _context.Users != null ? 
-                          View(await _context.Users.ToListAsync()) :
-                          Problem("Entity set 'TicketServiceContext.Users'  is null.");
+            var users = await _context.Users.ToListAsync();
+            // Pagination for users
+            if (page != null && page < 1)
+            {
+                page = 1;
+            }
+
+            int PageSize = 10;
+            var usersData = await users.ToPagedListAsync(page ?? 1, PageSize);
+            return View(usersData);
         }
 
         // GET: Users/Details/5
@@ -62,24 +71,10 @@ namespace mvc_dotnet.Controllers
             if (ModelState.IsValid)
             {
                 // Generate a random salt
-                byte[] saltBytes = new byte[16];
-                using (var rng = new RNGCryptoServiceProvider())
-                {
-                    rng.GetBytes(saltBytes);
-                }
+                user.Salt = Convert.ToBase64String(GenerateSalt());
 
-                // Convert the salt to base64 for storage
-                user.Salt = Convert.ToBase64String(saltBytes);
-
-                // Combine password and salt, then hash
-                using (var sha256 = new SHA256Managed())
-                {
-                    byte[] combinedBytes = Encoding.UTF8.GetBytes(user.Password).Concat(saltBytes).ToArray();
-                    byte[] hashedPasswordBytes = sha256.ComputeHash(combinedBytes);
-
-                    // Convert the hashed password to base64 for storage
-                    user.Password = Convert.ToBase64String(hashedPasswordBytes);
-                }
+                // Hash the password using the generated salt
+                user.Password = HashPassword(user.Password, user.Salt);
 
                 // Set other properties
                 user.CreateTime = DateTime.Now;
@@ -111,46 +106,19 @@ namespace mvc_dotnet.Controllers
 
             if (user != null)
             {
-                // Convert the stored salt and entered password to byte arrays
-                byte[] saltBytes = Convert.FromBase64String(user.Salt);
-                byte[] enteredPasswordBytes = Encoding.UTF8.GetBytes(password);
-
-                // Combine entered password and stored salt, then hash
-                using (var sha256 = new SHA256Managed())
+                if(ValidatePassword(password, user.Password, user.Salt))
                 {
-                    byte[] combinedBytes = enteredPasswordBytes.Concat(saltBytes).ToArray();
-                    byte[] hashedPasswordBytes = sha256.ComputeHash(combinedBytes);
-
-                    // Compare the hashed password with the stored hashed password
-                    if (Convert.ToBase64String(hashedPasswordBytes) == user.Password)
-                    {
-                        // Passwords match, login successful
-                        // Pass the username to the view
-                        ViewData["Username"] = user.Username;
-                        string? normalizedRole = user.Role?.ToLower()?.Trim();
-
-                        switch (normalizedRole)
-                        {
-                            case "admin":
-                                return RedirectToAction("Home", "Admins");
-                            case "customer":
-                                return RedirectToAction("Index", "Customers");
-                            case "content":
-                                return RedirectToAction("Home", "ContentAdmins");
-                            default:
-                                ModelState.AddModelError(string.Empty, "Invalid role");
-                                break;
-                        }
-                    }
+                    // Passwords match, login successful
+                    // Redirect based on user role (assuming you have a Role property in your User model)
+                    return RedirectToAction(GetRedirectActionForRole(user.Role));
                 }
+               
             }
 
             // Incorrect username or password, return to login view
             ModelState.AddModelError(string.Empty, "Invalid username or password");
             return View();
         }
-
-
 
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(string id)
@@ -173,35 +141,100 @@ namespace mvc_dotnet.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Username,Email,Password,CreateTime,Salt,Role")] User user)
+        public async Task<IActionResult> Edit(string id, [Bind("Username,Email,Password,CreateTime")] User userModel)
         {
-            if (id != user.Username)
+            if (id != userModel.Username)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
             {
-                try
-                {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Username))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                return NotFound();
+            }
+
+            // If you want to generate a new salt for each password change, uncomment the following line
+            byte[] newSaltBytes = GenerateSalt();
+
+            // Convert the new salt to base64 for storage
+            userModel.Salt = Convert.ToBase64String(newSaltBytes);
+
+            // Combine new password and salt, then hash
+            userModel.Password = HashPassword(userModel.Password, user.Salt);
+
+            // Update other properties
+            user.Email = userModel.Email;
+            user.CreateTime = userModel.CreateTime;
+            user.Password = userModel.Password;
+
+            user.Salt = userModel.Salt;
+
+            _context.Update(user);
+
+            try
+            {
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(userModel.Username))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
+
+        private string HashPassword(string password, string salt)
+        {
+            byte[] saltBytes = Convert.FromBase64String(salt);
+
+            using (var sha256 = new SHA256Managed())
+            {
+                byte[] combinedBytes = Encoding.UTF8.GetBytes(password).Concat(saltBytes).ToArray();
+                byte[] hashedPasswordBytes = sha256.ComputeHash(combinedBytes);
+                return Convert.ToBase64String(hashedPasswordBytes);
+            }
+        }
+
+        private bool ValidatePassword(string enteredPassword, string storedHashedPassword, string salt)
+        {
+            string hashedEnteredPassword = HashPassword(enteredPassword, salt);
+            return string.Equals(hashedEnteredPassword, storedHashedPassword, StringComparison.Ordinal);
+        }
+
+        private string GetRedirectActionForRole(string role)
+        {
+            switch (role?.ToLower()?.Trim())
+            {
+                case "admin":
+                    return "Home/Admins";
+                case "customer":
+                    return "Index/Customers";
+                case "content":
+                    return "Home/ContentAdmins";
+                default:
+                    return "Login";
+            }
+        }
+
+        private byte[] GenerateSalt()
+        {
+            byte[] saltBytes = new byte[16];
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(saltBytes);
+            }
+            return saltBytes;
+        }
+
+
 
         // GET: Users/Delete/5
         public async Task<IActionResult> Delete(string id)

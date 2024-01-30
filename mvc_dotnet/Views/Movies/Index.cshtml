@@ -1,10 +1,12 @@
-﻿@model IEnumerable<mvc_dotnet.Models.Movie>
+﻿@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model X.PagedList.IPagedList<mvc_dotnet.Models.Movie>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Movies";
 }
 
-<h1>Index</h1>
+<h1>Movies</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -13,25 +15,25 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.First().Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Content)
+                @Html.DisplayNameFor(model => model.First().Content)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Length)
+                @Html.DisplayNameFor(model => model.First().Length)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Type)
+                @Html.DisplayNameFor(model => model.First().Type)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Summary)
+                @Html.DisplayNameFor(model => model.First().Summary)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Director)
+                @Html.DisplayNameFor(model => model.First().Director)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ContentAdmin)
+                @Html.DisplayNameFor(model => model.First().ContentAdmin)
             </th>
             <th></th>
         </tr>
@@ -69,3 +71,19 @@
 }
     </tbody>
 </table>
+<!-- output a paging control that lets the user navigation to the previous page, next page, etc -->
+<nav>
+    @Html.PagedListPager(Model, page => Url.Action("index", new { page = page }), new PagedListRenderOptions()
+{
+    ActiveLiElementClass = "active",
+    PageClasses = new[] { "page-link" },
+    LiElementClasses = new[] { "page-item" },
+    UlElementClasses = new[] { "pagination", "justify-content-center", "mt-3" },
+    LinkToNextPageFormat = "Next",
+    LinkToPreviousPageFormat = "Previous",
+    MaximumPageNumbersToDisplay = 5,
+    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+
+})
+</nav>

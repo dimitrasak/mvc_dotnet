@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using mvc_dotnet.Models;
+using X.PagedList;
 
 namespace mvc_dotnet.Controllers
 {
@@ -40,10 +41,19 @@ namespace mvc_dotnet.Controllers
             return View(customer);
         }
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page)
         {
             var ticketServiceContext = _context.Customers.Include(c => c.UserUsernameNavigation);
-            return View(await ticketServiceContext.ToListAsync());
+            var customers = await ticketServiceContext.ToListAsync();
+            // Pagination for users
+            if (page != null && page < 1)
+            {
+                page = 1;
+            }
+
+            int PageSize = 10;
+            var customersData = await customers.ToPagedListAsync(page ?? 1, PageSize);
+            return View(customersData);
         }
 
         
