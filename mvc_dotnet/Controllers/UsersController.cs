@@ -23,9 +23,19 @@ namespace mvc_dotnet.Controllers
         }
 
         // GET: Users
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? page, string? search)
         {
-            var users = await _context.Users.ToListAsync();
+            ViewData["CurrentFilter"] = search;
+            var users = from u in _context.Users
+                        select u;
+            if (!String.IsNullOrEmpty(search))
+            {
+                users = users.Where(u => u.Username.Contains(search));
+            }
+
+            //users = users.OrderBy(c => c.Username);
+
+            //users = await _context.Users.ToListAsync();
             // Pagination for users
             if (page != null && page < 1)
             {

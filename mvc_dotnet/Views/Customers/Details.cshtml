@@ -7,7 +7,8 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Customer</h4>
+    <h4>Hello customer <i>@Html.DisplayFor(model => model.UserUsername)</i>! </h4>
+
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -24,6 +25,10 @@
         </dd>
     </dl>
 </div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Home">Go back to home page</a>
+</div>
 <h1>Your Reservations</h1>
 <table class="table">
     <tr>
@@ -35,6 +40,9 @@
         </th>
         <th>
             Movies Name
+        </th>
+        <th>
+
         </th>
     </tr>
 
@@ -50,10 +58,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Provoles.MoviesName)
             </td>
+            <td>
+                <a asp-controller="Reservations" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-controller="Reservations" asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-controller="Reservations" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
         </tr>
     }
 </table>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+

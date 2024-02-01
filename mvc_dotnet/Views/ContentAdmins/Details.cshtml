@@ -7,7 +7,8 @@
 <h1>Details</h1>
 
 <div>
-    <h4>ContentAdmin</h4>
+    <h4>Hello content admin <i>@Html.DisplayFor(model => model.UserUsername)</i>! </h4>
+
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -26,5 +27,133 @@
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Home">Go back to home page</a>
 </div>
+<h3 id="moviesHeading">Movies you added:</h3>
+<table id="moviesTable" class="table">
+    <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            Content
+        </th>
+        <th>
+            Length
+        </th>
+        <th>
+            Type
+        </th>
+        <th> 
+            Summary
+        </th>
+        <th> 
+            Director
+        </th>
+        <th>
+            
+        </th>
+    </tr>
+
+    @foreach (var item in Model.Movies)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Content)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Length)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Summary)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Director)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-controller="Movies" asp-route-id="@item.Id" asp-route-name="@item.Name">Edit</a> |
+                <a asp-action="Details" asp-controller="Movies" asp-route-id="@item.Id" asp-route-name="@item.Name">Details</a> |
+                <a asp-action="Delete" asp-controller="Movies" asp-route-id="@item.Id" asp-route-name="@item.Name">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
+<h3 id="screeningsHeading" style="display: none;">Screenings you added:</h3>
+<table id="screeningsTable" class="table" style="display: none;">
+    <tr>
+        <th>
+            Cinemas Name
+        </th>
+        <th>
+            Movies Name
+        </th>
+        <th>
+            Date & time of the screening
+        </th>
+        <th> 
+
+        </th>
+    </tr>
+
+    @foreach (var item in Model.Provoles)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cinemas.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MoviesName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DatetimeColumn)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-controller="Provoles" asp-route-CinemasId="@item.CinemasId" asp-route-MoviesId="@item.MoviesId" asp-route-MoviesName="@item.MoviesName">Edit</a> |
+                <a asp-action="Details" asp-controller="Provoles" asp-route-CinemasId="@item.CinemasId" asp-route-MoviesId="@item.MoviesId" asp-route-MoviesName="@item.MoviesName">Details</a> |
+                <a asp-action="Delete" asp-controller="Provoles" asp-route-CinemasId="@item.CinemasId" asp-route-MoviesId="@item.MoviesId" asp-route-MoviesName="@item.MoviesName">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
+<div>
+    <button id="previousButton" class="btn btn-primary" style="display: none;">Previous</button>
+    <button id="nextButton" class="btn btn-primary">Next</button>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    var currentTableIndex = 0;
+
+    // Function to toggle the visibility of tables and headings based on the currentTableIndex
+    function toggleTables() {
+        if (currentTableIndex === 0) {
+            $("#moviesTable, #moviesHeading").show();
+            $("#screeningsTable, #screeningsHeading, #previousButton").hide();
+        } else {
+            $("#moviesTable, #moviesHeading").hide();
+            $("#screeningsTable, #screeningsHeading, #previousButton").show();
+        }
+    }
+
+    // Function to handle the Next button click
+    $("#nextButton").click(function () {
+        currentTableIndex++;
+        toggleTables();
+    });
+
+    // Function to handle the Previous button click
+    $("#previousButton").click(function () {
+        currentTableIndex--;
+        toggleTables();
+    });
+
+    // Initial toggle
+    toggleTables();
+</script>

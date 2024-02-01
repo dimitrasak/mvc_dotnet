@@ -22,14 +22,25 @@ namespace mvc_dotnet.Controllers
         public IActionResult Home()
         {
             // Add any logic or data retrieval specific to the admin home page
+            if (TempData.ContainsKey("SuccessMessage"))
+            {
+                // Retrieve the success message
+                ViewBag.SuccessMessage = TempData["SuccessMessage"];
+            }
             return View();
         }
 
         // GET: ContentAdmins
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? page, string? search)
         {
-            var ticketServiceContext = _context.ContentAdmins.Include(c => c.UserUsernameNavigation);
-            var cont_admins = await ticketServiceContext.ToListAsync();
+            ViewData["CurrentFilter"] = search;
+            var cont_admins = from c in _context.ContentAdmins.Include(c => c.UserUsernameNavigation)
+                              select c;
+            if (!String.IsNullOrEmpty(search))
+            {
+                cont_admins = cont_admins.Where(c => c.UserUsernameNavigation.Username.Contains(search));
+            }
+            //var cont_admins = await ticketServiceContext.ToListAsync();
             // Pagination for users
             if (page != null && page < 1)
             {
@@ -51,6 +62,9 @@ namespace mvc_dotnet.Controllers
 
             var contentAdmin = await _context.ContentAdmins
                 .Include(c => c.UserUsernameNavigation)
+                .Include(c => c.Movies)
+                .ThenInclude(c => c.Provoles)
+                .ThenInclude(c => c.Cinemas)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (contentAdmin == null)
             {

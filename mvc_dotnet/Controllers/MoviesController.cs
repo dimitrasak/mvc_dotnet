@@ -22,10 +22,20 @@ namespace mvc_dotnet.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? page, string? search)
         {
-            var ticketServiceContext = _context.Movies.Include(m => m.ContentAdmin);
-            var movies = await ticketServiceContext.ToListAsync();
+            ViewData["CurrentFilter"] = search;
+            var movies = from m in _context.Movies.Include(m => m.ContentAdmin)
+                         select m;
+            //var movies = await ticketServiceContext.ToListAsync();
+            //search
+            if (!String.IsNullOrEmpty(search))
+            {
+                movies = movies.Where(m => m.Name.Contains(search)
+                                       || m.Director.Contains(search));
+            }
+            movies = movies.OrderBy(m => m.Name).ThenBy(m => m.Director);
+
             // Pagination for users
             if (page != null && page < 1)
             {
@@ -75,7 +85,9 @@ namespace mvc_dotnet.Controllers
                 movie.Id = GetNextId(); // Assuming GetNextId is a method to get the next available ID
                 _context.Add(movie);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Movie added successfully.";
+
+                return RedirectToAction("Home", "ContentAdmins");
             }
             ViewData["ContentAdminId"] = new SelectList(_context.ContentAdmins, "Id", "UserUsername", movie.ContentAdminId);
             return View(movie);
@@ -177,7 +189,8 @@ namespace mvc_dotnet.Controllers
             }
             
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            TempData["SuccessMessage"] = "Movie deleted successfully.";
+            return RedirectToAction("Home", "ContentAdmins");
         }
 
         private bool MovieExists(int id)

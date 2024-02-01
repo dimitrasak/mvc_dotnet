@@ -9,7 +9,7 @@
 <h1>Screenings</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <!--<a asp-action="Create">Create New</a>-->
 </p>
 <table class="table table-hover">
     <thead>
@@ -29,8 +29,8 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.First().DatetimeColumn)
-            </th>
-            <th></th>
+            </th>            
+            
         </tr>
     </thead>
     <tbody>
@@ -50,16 +50,14 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DatetimeColumn)
-            </td>
+            </td>  
+
             <td>
                     
-                <td>
-                    <a asp-action="Edit" asp-route-CinemasId="@item.CinemasId" asp-route-MoviesId="@item.MoviesId" asp-route-MoviesName="@item.MoviesName">Edit</a> |
-                    <a asp-action="Details" asp-route-CinemasId="@item.CinemasId" asp-route-MoviesId="@item.MoviesId" asp-route-MoviesName="@item.MoviesName">Details</a> |
-                    <a asp-action="Delete" asp-route-CinemasId="@item.CinemasId" asp-route-MoviesId="@item.MoviesId" asp-route-MoviesName="@item.MoviesName">Delete</a>
-                </td>
-
-
+            <td>
+                <!--<a asp-action="Edit" asp-route-CinemasId="@item.CinemasId" asp-route-MoviesId="@item.MoviesId" asp-route-MoviesName="@item.MoviesName">Edit</a> |-->
+                <a asp-action="Details" asp-route-CinemasId="@item.CinemasId" asp-route-MoviesId="@item.MoviesId" asp-route-MoviesName="@item.MoviesName">Details</a> |
+                <!--<a asp-action="Delete" asp-route-CinemasId="@item.CinemasId" asp-route-MoviesId="@item.MoviesId" asp-route-MoviesName="@item.MoviesName">Delete</a>-->
             </td>
         </tr>
 }

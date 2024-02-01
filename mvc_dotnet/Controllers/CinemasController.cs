@@ -20,9 +20,15 @@ namespace mvc_dotnet.Controllers
         }
 
         // GET: Cinemas
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? page, string? search)
         {
-            var cinemas = await _context.Cinemas.ToListAsync();
+            ViewData["CurrentFilter"] = search;
+            var cinemas = from c in _context.Cinemas
+                            select c;
+            if (!String.IsNullOrEmpty(search))
+            {
+                cinemas = cinemas.Where(c => c.Name.Contains(search));
+            }
             // Pagination for users
             if (page != null && page < 1)
             {
@@ -70,7 +76,8 @@ namespace mvc_dotnet.Controllers
                 cinema.Id = GetNextId();
                 _context.Add(cinema);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Cinema added successfully.";
+                return RedirectToAction("Home", "ContentAdmins");
             }
             return View(cinema);
         }
@@ -168,7 +175,9 @@ namespace mvc_dotnet.Controllers
             }
             
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            TempData["SuccessMessage"] = "Cinema deleted successfully.";
+            return RedirectToAction("Home", "ContentAdmins");
         }
 
         private bool CinemaExists(int id)

@@ -22,10 +22,25 @@ namespace mvc_dotnet.Controllers
         }
 
         // GET: Provoles
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? page, string? search)
         {
-            var ticketServiceContext = _context.Provoles.Include(p => p.Cinemas).Include(p => p.ContentAdmin).Include(p => p.Movies);
-            var provoles = await ticketServiceContext.ToListAsync();
+            ViewData["CurrentFilter"] = search;
+
+            var provoles = from p in _context.Provoles.Include(p => p.Cinemas)
+                .Include(p => p.ContentAdmin)
+                .Include(p => p.Movies)
+                .Include(p => p.Reservations)
+                           select p;
+            var provolesL = await provoles.ToListAsync();
+            //Search
+            if (!String.IsNullOrEmpty(search))
+            {
+                provoles = provoles.Where(p => p.MoviesName.Contains(search)
+                                       || p.Cinemas.Name.Contains(search));
+            }
+
+            provoles = provoles.OrderBy(p => p.MoviesName).ThenBy(p => p.Cinemas.Name);
+
             // Pagination for users
             if (page != null && page < 1)
             {

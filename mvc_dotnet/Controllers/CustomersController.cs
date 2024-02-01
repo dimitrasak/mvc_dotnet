@@ -41,10 +41,18 @@ namespace mvc_dotnet.Controllers
             return View(customer);
         }
         // GET: Customers
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? page, string? search)
         {
-            var ticketServiceContext = _context.Customers.Include(c => c.UserUsernameNavigation);
-            var customers = await ticketServiceContext.ToListAsync();
+            ViewData["CurrentFilter"] = search;
+            var customers = from c in _context.Customers.Include(c => c.UserUsernameNavigation)
+                            select c;
+
+            if (!String.IsNullOrEmpty(search))
+            {
+                customers = customers.Where(c => c.UserUsernameNavigation.Username.Contains(search));
+            }
+
+            //var customersList = await customers.ToListAsync();
             // Pagination for users
             if (page != null && page < 1)
             {

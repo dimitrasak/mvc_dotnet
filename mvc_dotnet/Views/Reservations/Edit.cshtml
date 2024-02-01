@@ -10,33 +10,35 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="NumberOfSeats" class="control-label"></label>
                 <input asp-for="NumberOfSeats" class="form-control" />
                 <span asp-validation-for="NumberOfSeats" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ProvolesCinemasId" class="control-label"></label>
-                <select asp-for="ProvolesCinemasId" class="form-control" asp-items="ViewBag.ProvolesCinemasId"></select>
-                <span asp-validation-for="ProvolesCinemasId" class="text-danger"></span>
-            </div>
+
+            <!-- Keep the existing ProvolesMoviesId field as a readonly field -->
             <div class="form-group">
                 <label asp-for="ProvolesMoviesId" class="control-label"></label>
-                <select asp-for="ProvolesMoviesId" class="form-control" asp-items="ViewBag.ProvolesMoviesId"></select>
+                <input asp-for="ProvolesMoviesId" class="form-control" readonly />
                 <span asp-validation-for="ProvolesMoviesId" class="text-danger"></span>
             </div>
+
+            <!-- Keep the existing ProvolesMoviesName field as a readonly field -->
             <div class="form-group">
                 <label asp-for="ProvolesMoviesName" class="control-label"></label>
-                <select asp-for="ProvolesMoviesName" class="form-control" asp-items="ViewBag.ProvolesMoviesName"></select>
+                <input asp-for="ProvolesMoviesName" class="form-control" readonly />
                 <span asp-validation-for="ProvolesMoviesName" class="text-danger"></span>
             </div>
+
+            <!-- Keep the existing ProvolesCinemasId field as a readonly field -->
             <div class="form-group">
-                <label asp-for="CustomersId" class="control-label"></label>
-                <select asp-for="CustomersId" class="form-control" asp-items="ViewBag.CustomersId"></select>
-                <span asp-validation-for="CustomersId" class="text-danger"></span>
+                <label asp-for="ProvolesCinemasId" class="control-label"></label>
+                <input asp-for="ProvolesCinemasId" class="form-control" readonly />
+                <span id="cinemaName" class="text-muted"></span>
             </div>
+            <input type="hidden" asp-for="CustomersId" />
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -48,4 +50,28 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" crossorigin="anonymous"></script>
+    <script>
+        function fetchCinemaName() {
+            var selectedCinemasId = $("#ProvolesCinemasId").val();
+            console.log("Selected Cinemas ID: ", selectedCinemasId);
+
+            $.ajax({
+                url: '@Url.Action("GetCinemaNameById", "Reservations")',
+                type: 'POST',
+                data: { cinemasId: selectedCinemasId },
+                success: function (data) {
+                    console.log("Cinema Name received: ", data);
+                    $('#cinemaName').text(data);
+                }
+            });
+        }
+    </script>
+}
+
 

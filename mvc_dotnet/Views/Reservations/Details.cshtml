@@ -7,7 +7,7 @@
 <h1>Details</h1>
 
 <div>
-    <h4><i>@Html.DisplayFor(model => model.Customers.Name):</i> Reservation made successfully! </h4>
+    <h4><i>@Html.DisplayFor(model => model.Customers.Name):</i> Reservation <strong>#@Html.DisplayFor(model => model.Id)</strong></h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -23,13 +23,19 @@
             @Html.DisplayFor(model => model.Customers.Name)
         </dd>
         <hr />
-        <h6>Important information about the screening!</h6>
+        <h6>Important information about the <i>screening</i>!</h6>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Provoles)
+            @Html.DisplayNameFor(model => model.Provoles.MoviesName)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Provoles.MoviesName)
-        </dd>        
+        </dd>   
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Provoles.Cinemas)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Provoles.Cinemas.Name)
+        </dd>
     </dl>
 </div>
 <div>
