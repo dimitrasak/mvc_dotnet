@@ -5,7 +5,7 @@
 }
 
 <div class="container mt-4">
-    <h2>Welcome to the Admin Home Page, <span class="text-primary">@ViewData["Username"]</span>!</h2>
+    <h2>Welcome to the <i>Admin</i> Home Page!</span>!</h2>
 
     <p class="text-info">Explore other pages:</p>
     <ul class="list-group">
@@ -14,6 +14,8 @@
         <li class="list-group-item"><a class="text-decoration-none text-warning" asp-controller="Provoles" asp-action="Index">Provoles</a></li>
         <li class="list-group-item"><a class="text-decoration-none text-danger" asp-controller="Cinemas" asp-action="Index">Cinemas</a></li>
         <li class="list-group-item"><a class="text-decoration-none text-info" asp-controller="Admins" asp-action="AssignRole">Assign Roles to Users</a></li>
-        <li class="list-group-item"><a class="text-decoration-none text-secondary" asp-controller="ContentAdmins" asp-action="Create">Create a New Content Admin</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-secondary" asp-controller="ContentAdmins" asp-action="Create">Create a New Content Admin Account</a></li>
+        <li class="list-group-item"><a class="text-decoration-none text-primary" asp-controller="Customer" asp-action="Create">Create a New Customer Account</a></li>
+
     </ul>
 </div>

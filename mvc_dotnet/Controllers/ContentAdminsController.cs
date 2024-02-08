@@ -87,10 +87,11 @@ namespace mvc_dotnet.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,UserUsername")] ContentAdmin contentAdmin)
+        public async Task<IActionResult> Create([Bind("Name,UserUsername")] ContentAdmin contentAdmin)
         {
             if (ModelState.IsValid)
             {
+                contentAdmin.Id = GetNextId();
                 _context.Add(contentAdmin);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -99,6 +100,13 @@ namespace mvc_dotnet.Controllers
             var contentUsers = _context.Users.Where(u => u.Role == "Content");
             ViewData["UserUsername"] = new SelectList(contentUsers, "Username", "Username", contentAdmin.UserUsername);
             return View(contentAdmin);
+        }
+
+        private int GetNextId()
+        {
+            // Logic to get the next available ID, for example, querying the database or using a counter
+            int nextId = _context.ContentAdmins.Max(c => (int?)c.Id) ?? 0;
+            return nextId + 1;
         }
 
         // GET: ContentAdmins/Edit/5

@@ -101,10 +101,11 @@ namespace mvc_dotnet.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,UserUsername")] Customer customer)
+        public async Task<IActionResult> Create([Bind("Name,UserUsername")] Customer customer)
         {
             if (ModelState.IsValid)
             {
+                customer.Id = GetNextId();
                 _context.Add(customer);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -112,6 +113,13 @@ namespace mvc_dotnet.Controllers
             var customerUsers = _context.Users.Where(u => u.Role == "Customer");
             ViewData["UserUsername"] = new SelectList(customerUsers, "Username", "Username", customer.UserUsername);
             return View(customer);
+        }
+
+        private int GetNextId()
+        {
+            // Logic to get the next available ID, for example, querying the database or using a counter
+            int nextId = _context.Customers.Max(c => (int?)c.Id) ?? 0;
+            return nextId + 1;
         }
 
         // GET: Customers/Edit/5

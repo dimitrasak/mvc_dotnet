@@ -96,7 +96,6 @@ namespace mvc_dotnet.Controllers
         private int GetNextId()
         {
             // Logic to get the next available ID, for example, querying the database or using a counter
-            // Replace this with your actual logic
             int nextId = _context.Movies.Max(m => (int?)m.Id) ?? 0;
             return nextId + 1;
         }

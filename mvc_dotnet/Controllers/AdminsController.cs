@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,7 @@ namespace mvc_dotnet.Controllers
         }
 
         public IActionResult AssignRole()
-        {
+        {  
             // Retrieve a list of users from the database
             var users = _context.Users.ToList();
 
@@ -53,10 +54,12 @@ namespace mvc_dotnet.Controllers
                     // Update the database
                     _context.SaveChanges();
 
+                    TempData["SuccessMessage"] = "Role assigned successfully";
+
                     // Optionally, you may return a response indicating success or failure
                     return Ok(new { Message = "Role assigned successfully" });
                 }
-
+                TempData["ErrorMessage"] = "User not found";
                 // User not found
                 return NotFound(new { Message = "User not found" });
             }
@@ -67,16 +70,20 @@ namespace mvc_dotnet.Controllers
                 {
                     // Handle the duplicate key violation here
                     // For example, show a message to the user
+                    TempData["ErrorMessage"] = "Error: Duplicate record already exists in the table.";
                     return BadRequest(new { Message = "Error: Duplicate record already exists in the table." });
                 }
                 else
                 {
+                    TempData["ErrorMessage"] = "Error: Internal Server Error while processing the request.";
                     // Handle other DbUpdateException scenarios or rethrow the exception
                     return StatusCode(500, new { Message = "Internal Server Error" });
                 }
             }
             catch (Exception ex)
             {
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
+
                 // Handle other exceptions as needed
                 return StatusCode(500, new { Message = "Internal Server Error" });
             }
@@ -146,16 +153,24 @@ namespace mvc_dotnet.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,UserUsername")] Admin admin)
+        public async Task<IActionResult> Create([Bind("Name,UserUsername")] Admin admin)
         {
             if (ModelState.IsValid)
             {
+                admin.Id = GetNextId();
                 _context.Add(admin);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["UserUsername"] = new SelectList(_context.Users, "Username", "Username", admin.UserUsername);
             return View(admin);
+        }
+
+        private int GetNextId()
+        {
+            // Logic to get the next available ID, for example, querying the database or using a counter
+            int nextId = _context.Admins.Max(a => (int?)a.Id) ?? 0;
+            return nextId + 1;
         }
 
         // GET: Admins/Edit/5

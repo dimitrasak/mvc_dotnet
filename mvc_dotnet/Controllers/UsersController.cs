@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -120,7 +121,17 @@ namespace mvc_dotnet.Controllers
                 {
                     // Passwords match, login successful
                     // Redirect based on user role (assuming you have a Role property in your User model)
-                    return RedirectToAction(GetRedirectActionForRole(user.Role));
+                    switch (user.Role?.ToLower()?.Trim())
+                    {
+                        case "admin":
+                            return RedirectToAction("Home", "Admins");
+                        case "customer":
+                            return RedirectToAction("Home", "Customers");
+                        case "content":
+                            return RedirectToAction("Home", "ContentAdmins");
+                        default:
+                            return RedirectToAction("Login", "Users");
+                    }
                 }
                
             }
@@ -172,7 +183,7 @@ namespace mvc_dotnet.Controllers
             userModel.Salt = Convert.ToBase64String(newSaltBytes);
 
             // Combine new password and salt, then hash
-            userModel.Password = HashPassword(userModel.Password, user.Salt);
+            userModel.Password = HashPassword(userModel.Password, userModel.Salt);
 
             // Update other properties
             user.Email = userModel.Email;
@@ -219,21 +230,7 @@ namespace mvc_dotnet.Controllers
             return string.Equals(hashedEnteredPassword, storedHashedPassword, StringComparison.Ordinal);
         }
 
-        private string GetRedirectActionForRole(string role)
-        {
-            switch (role?.ToLower()?.Trim())
-            {
-                case "admin":
-                    return "Home/Admins";
-                case "customer":
-                    return "Index/Customers";
-                case "content":
-                    return "Home/ContentAdmins";
-                default:
-                    return "Login";
-            }
-        }
-
+        
         private byte[] GenerateSalt()
         {
             byte[] saltBytes = new byte[16];

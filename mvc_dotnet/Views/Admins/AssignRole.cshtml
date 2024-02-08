@@ -61,6 +61,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
+
     function assignRole(username) {
         var newRole = $('#user_NewRole_' + username).val();
         $.ajax({
@@ -71,8 +72,8 @@
                 // Update the role value in the table without reloading the page
                 $('#roleTd_' + username).text(newRole);
 
-                // Handle the success response if needed
-                console.log('Roles assigned successfully');
+                // Display the success message dynamically
+                showSuccessMessage("Role assigned successfully");
             },
             error: function (error) {
                 // Handle the error response if needed
@@ -80,7 +81,23 @@
             }
         });
     }
+
+    function showSuccessMessage(message) {
+        // Create a div for success message
+        var successDiv = $('<div>').addClass('alert alert-success').text(message);
+
+        // Append the div to the body
+        $('body').prepend(successDiv);
+
+        // Automatically remove the success message after a certain duration (e.g., 5 seconds)
+        setTimeout(function () {
+            successDiv.remove();
+        }, 5000);
+    }
+
+
 </script>
+
 
 
 
