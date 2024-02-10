@@ -117,8 +117,14 @@ namespace mvc_dotnet.Controllers
 
             if (user != null)
             {
-                if(ValidatePassword(password, user.Password, user.Salt))
+                if(!string.IsNullOrEmpty(password) && ValidatePassword(password, user.Password, user.Salt))
                 {
+                    if (string.IsNullOrEmpty(user.Role))
+                    {
+                        // User does not have a role, show a message
+                        ModelState.AddModelError(string.Empty, "User does not have a role. Please contact the administrator.");
+                        return View("Login"); // Assuming you have a Login view
+                    }
                     // Passwords match, login successful
                     // Redirect based on user role (assuming you have a Role property in your User model)
                     switch (user.Role?.ToLower()?.Trim())
@@ -133,6 +139,7 @@ namespace mvc_dotnet.Controllers
                             return RedirectToAction("Login", "Users");
                     }
                 }
+                
                
             }
 
@@ -213,7 +220,7 @@ namespace mvc_dotnet.Controllers
         }
 
         private string HashPassword(string password, string salt)
-        {
+        {      
             byte[] saltBytes = Convert.FromBase64String(salt);
 
             using (var sha256 = new SHA256Managed())
